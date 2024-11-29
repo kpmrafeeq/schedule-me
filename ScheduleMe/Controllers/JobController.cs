@@ -3,6 +3,7 @@ using Quartz;
 using Quartz.Impl.Matchers;
 using ScheduleMe.Job;
 using ScheduleMe.Model;
+using System.Runtime;
 using System.Text.Json;
 
 namespace ScheduleMe.Controllers
@@ -68,7 +69,7 @@ namespace ScheduleMe.Controllers
                     var nextFireTime = trigger.GetNextFireTimeUtc()?.ToLocalTime();
                     var state = await scheduler.GetTriggerState(trigger.Key);
 
-                    jobs.Add(new
+                    var jobInfo = new
                     {
                         JobKey = jobKey.Name,
                         JobGroup = jobKey.Group,
@@ -78,11 +79,25 @@ namespace ScheduleMe.Controllers
                         Url = detail?.JobDataMap.GetString("Url"),
                         Headers = detail?.JobDataMap.GetString("Headers"),
                         Body = detail?.JobDataMap.GetString("Body")
-                    });
+                    };
+
+
+                    var formattedJobInfo = $@"
+                        JobKey:         {jobInfo.JobKey}
+                            JobGroup:       {jobInfo.JobGroup}
+                            CronExpression: {jobInfo.CronExpression}
+                            NextFireTime:   {jobInfo.NextFireTime}
+                            Status:         {jobInfo.Status}
+                            Url:            {jobInfo.Url}
+                            Headers:        {jobInfo.Headers}
+                            Body:           {jobInfo.Body}
+                    ";
+
+                    jobs.Add(formattedJobInfo);
                 }
             }
 
-            return Ok(jobs);
+            return Ok(string.Join("\n", jobs));
         }
 
 
