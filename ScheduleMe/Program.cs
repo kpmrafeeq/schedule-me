@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 // Register IHttpClientFactory
 builder.Services.AddHttpClient();
 
+
 builder.Services.AddQuartz(q =>
 {
 });

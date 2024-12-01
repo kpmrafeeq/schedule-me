@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Quartz;
 using Quartz.Impl.Matchers;
+using ScheduleMe.Data;
 using ScheduleMe.Job;
 using ScheduleMe.Model;
+using ScheduleMe.Models;
+using System.Net;
 using System.Runtime;
 using System.Text.Json;
 
@@ -44,6 +47,36 @@ namespace ScheduleMe.Controllers
                 .Build();
 
             await scheduler.ScheduleJob(job, trigger);
+
+
+            return Ok("Job scheduled successfully");
+        }
+
+        [Route("run/{minutes}/later")]
+        [HttpPost]
+        public async Task<IActionResult> RunOnlyOne([FromBody] JobRequest request, int minutes)
+        {
+            var scheduler = await _scheduleFactory.GetScheduler();
+            _logger.LogInformation("Scheduling job");
+
+            if (minutes == 0)
+            {
+                return BadRequest("minutes is required.");
+            }
+
+            var job = JobBuilder.Create<HttpJob>()
+                .WithIdentity(request.Name)
+                .UsingJobData("Url", request.Url)
+                .UsingJobData("Headers", JsonSerializer.Serialize(request.Headers))
+                .UsingJobData("Body", request.Body)
+                .Build();
+
+            var trigger = TriggerBuilder.Create()
+                .StartAt(DateTime.Now.AddMinutes(minutes))
+                .Build();
+
+            await scheduler.ScheduleJob(job, trigger);
+
 
             return Ok("Job scheduled successfully");
         }
