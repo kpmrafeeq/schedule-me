@@ -17,8 +17,10 @@
 
   <ItemGroup>
     <None Remove="Data\" />
+    <None Remove="Middleware\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Middleware\" />
   </ItemGroup>
 </Project>

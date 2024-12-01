@@ -27,6 +27,9 @@ builder.Services.AddQuartzServer(options =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ScheduleMe.Middleware.ErrorHandlerMiddleware>();
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
